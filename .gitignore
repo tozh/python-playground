@@ -1,0 +1,17 @@
+.ssh*
+vscode
+.vscode
+vendor
+_vendor*
+.idea
+*.pyc
+*.DS_Store*
+*.key
+*.crt
+*.exe
+*.dll
+*.so
+*dylib
+*.test
+__pycache__/
+

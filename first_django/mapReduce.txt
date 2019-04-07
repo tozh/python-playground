@@ -1,0 +1,69 @@
+var followers_map = function() { emit(this.self_id, this.followed_by);} ;
+
+var followers_reduce = function(key, values) {
+    if (values.length>=1) {
+        values.sort();
+        var re = [values[0]];
+        for (var i=0; i<values.length ;i++) {
+            if(values[i]!==re[re.length-1]) {
+                re.push(values[i]);
+            }
+        }
+        return { "followers":re};
+    }
+    else {
+        return { "followers":values}
+    }
+};
+
+var followers_options = {
+    out: "followers"
+};
+
+ db.followedBy.mapReduce(followers_map, followers_reduce, followers_options )
+
+var followers_fe = function(entry) {
+    var key = entry['_id'];
+    var arr = entry['value']['followers']
+    db.users.update({'_id':key}, {$set:{"followers":arr}})
+};
+
+db.followers.find().forEach(followers_fe);
+
+
+var followees_map = function() { emit(this.followed_by, this.self_id);} ;
+
+var followees_reduce = function(key, values) {
+    if (values.length>=1) {
+        values.sort();
+        var re = [values[0]];
+        for (var i=0; i<values.length ;i++) {
+            if(values[i]!==re[re.length-1]) {
+                re.push(values[i]);
+            }
+        }
+        return { "followees":re};
+    }
+    else {
+        return { "followees":values}
+    }
+};
+
+var followees_options = {
+    out: "followees"
+};
+
+ db.followedBy.mapReduce(followees_map, followees_reduce, followees_options )
+
+var followees_fe = function(entry) {
+    var key = entry['_id'];
+    var arr = entry['value']['followees']
+    db.users.update({'_id':key}, {$set:{"followees":arr}})
+};
+
+db.followees.find().forEach(followees_fe);
+
+
+
+
+
